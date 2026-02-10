@@ -21,6 +21,48 @@ import factory
 from factory.fuzzy import FuzzyChoice, FuzzyDecimal
 from service.models import Product, Category
 
+PRODUCTS = [
+    # UNKNOWN
+    "Mystery Box",
+    "Unlabeled Item",
+    "Generic Product",
+
+    # CLOTHS
+    "Cotton T-Shirt",
+    "Denim Jeans",
+    "Hooded Sweatshirt",
+    "Winter Jacket",
+    "Athletic Socks",
+
+    # FOOD
+    "Organic Brown Rice",
+    "Canned Tuna",
+    "Dark Chocolate Bar",
+    "Instant Noodles",
+    "Ground Coffee",
+
+    # HOUSEWARES
+    "Ceramic Dinner Plate",
+    "Stainless Steel Spoon Set",
+    "Glass Storage Jar",
+    "Non-Stick Frying Pan",
+    "Laundry Basket",
+
+    # AUTOMOTIVE
+    "Car Engine Oil",
+    "Windshield Wiper Blades",
+    "Car Battery",
+    "Tire Pressure Gauge",
+    "Dashboard Phone Mount",
+
+    # TOOLS
+    "Phillips Screwdriver",
+    "Adjustable Wrench",
+    "Claw Hammer",
+    "Measuring Tape",
+    "Cordless Power Drill",
+]
+
 
 class ProductFactory(factory.Factory):
     """Creates fake products for testing"""
@@ -31,4 +73,8 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-   ## Add code to create Fake Products 
+    name = FuzzyChoice(choices=PRODUCTS)
+    description = factory.Faker("text")
+    price = FuzzyDecimal(low=0.5, high=2000, precision=2)
+    available = FuzzyChoice(choices=[True, False])
+    category = FuzzyChoice(choices=[category.name for category in Category])
