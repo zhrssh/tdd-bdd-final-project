@@ -251,6 +251,43 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products.count(), count)
         self.assertEqual(product_category, retrieved_product.category)
 
+    def test_find_product_by_price(self):
+        """It should find product by price"""
+        # Create products
+        for _ in range(10):
+            product = ProductFactory()
+            product.create()
+
+        # Retrieve price
+        products = Product.all()
+        product_price = products[0].price
+        count = len([product for product in products if product.price == product_price])
+
+        # Test function
+        products = Product.find_by_price(product_price)
+        retrieved_product = products[0]
+        self.assertEqual(products.count(), count)
+        self.assertEqual(product_price, retrieved_product.price)
+
+    def test_find_product_by_price_string(self):
+        """It should find product by price"""
+        # Create products
+        for _ in range(10):
+            product = ProductFactory()
+            product.create()
+
+        # Retrieve price
+        products = Product.all()
+        product_price = products[0].price
+        count = len([product for product in products if product.price == product_price])
+
+        # Test function
+        products = Product.find_by_price(str(product_price))
+        retrieved_product = products[0]
+        self.assertEqual(products.count(), count)
+        self.assertEqual(product_price, retrieved_product.price)
+
+
     def test_deserialize(self):
         """It should deserialize properly"""
         product = ProductFactory()
