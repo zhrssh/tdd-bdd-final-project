@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -147,6 +147,22 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(updated_product.id, original_id)
         self.assertEqual(updated_product.description, new_description)
 
+    def test_update_a_product_no_id(self):
+        """It should not update a product with no id"""
+        products = Product.all()
+        self.assertEqual(products, [])
+        product = ProductFactory()
+        app.logger.info(product)
+        product.id = None
+        product.create()
+        app.logger.info(product)
+
+        # Update the description
+        new_description = "New description"
+        product.description = new_description
+        product.id = None
+        self.assertRaises(DataValidationError, product.update)
+
     def test_delete_a_product(self):
         """It should delete a product"""
         products = Product.all()
@@ -234,3 +250,34 @@ class TestProductModel(unittest.TestCase):
         retrieved_product = products[0]
         self.assertEqual(products.count(), count)
         self.assertEqual(product_category, retrieved_product.category)
+
+    def test_deserialize(self):
+        """It should deserialize properly"""
+        product = ProductFactory()
+        product_dict = product.serialize()
+        results = product.deserialize(product_dict)
+        self.assertEqual(product.name, results.name)
+        self.assertEqual(product.description, results.description)
+        self.assertEqual(product.price, results.price)
+        self.assertEqual(product.available, results.available)
+        self.assertEqual(product.category, results.category)
+
+    def test_deserialize_invalid_bool(self):
+        """It should return an error when 'available' is not boolean"""
+        product = ProductFactory()
+        product_dict = product.serialize()
+        product_dict["available"] = 2
+        self.assertRaises(DataValidationError, product.deserialize, product_dict)
+
+    def test_deserialize_invalid_category(self):
+        """It should return an error when 'category' is not part of Category Enum"""
+        product = ProductFactory()
+        product_dict = product.serialize()
+        product_dict["category"] = "ERROR"
+        self.assertRaises(DataValidationError, product.deserialize, product_dict)
+
+    def test_deserialize_invalid_type(self):
+        """It should return an error when no dictionary is passed"""
+        product = ProductFactory()
+        product_dict = None
+        self.assertRaises(DataValidationError, product.deserialize, product_dict)

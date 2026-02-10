@@ -89,15 +89,13 @@ def create_products():
     #
     # Uncomment this line of code once you implement READ A PRODUCT
     #
-    # location_url = url_for("get_products", product_id=product.id, _external=True)
-    location_url = "/"  # delete once READ is implemented
+    location_url = url_for("get_products", product_id=product.id, _external=True)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
 # L I S T   A L L   P R O D U C T S
 ######################################################################
-
 @app.route("/products", methods=["GET"])
 def get_all_products():
     """
@@ -133,7 +131,7 @@ def get_all_products():
 
 
 @app.route("/products/<product_id>", methods=["GET"])
-def get_product(product_id):
+def get_products(product_id):
     """
     Retrieve a single Product
     This endpoint will return a Product based on its id
