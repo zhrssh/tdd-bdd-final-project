@@ -28,13 +28,13 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
+from service.models import Category
 from tests.factories import ProductFactory
 
-from urllib.parse import quote_plus
-from service.models import Product, Category
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -178,7 +178,7 @@ class TestProductRoutes(TestCase):
         """It should return an error when no product is found"""
         response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_update_product(self):
         """It should update a product"""
         test_product = self._create_products(1)[0]
@@ -191,7 +191,7 @@ class TestProductRoutes(TestCase):
 
         updated_product = response.get_json()
         self.assertEqual(updated_product["description"], "Updated description")
-    
+
     def test_delete_product(self):
         """It should delete a product"""
         test_product = self._create_products(1)[0]
@@ -204,7 +204,7 @@ class TestProductRoutes(TestCase):
 
     def test_list_all_products(self):
         """It should list all products"""
-        test_product = self._create_products(5)
+        self._create_products(5)
         response = self.client.get(f"{BASE_URL}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.get_json()
@@ -219,7 +219,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.get_json()
         self.assertEqual(len(products), name_count)
-        
+
         for data in products:
             self.assertEqual(test_name, data["name"])
 
@@ -232,7 +232,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.get_json()
         self.assertEqual(len(products), category_count)
-        
+
         for data in products:
             self.assertEqual(test_category, getattr(Category, data["category"].upper()))
 
@@ -245,10 +245,9 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.get_json()
         self.assertEqual(len(products), available_count)
-        
+
         for data in products:
             self.assertEqual(test_available, bool(data["available"]))
-
 
     ######################################################################
     # Utility functions

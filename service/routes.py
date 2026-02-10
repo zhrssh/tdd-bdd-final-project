@@ -107,29 +107,30 @@ def get_all_products():
     name = request.args.get("name")
     category = request.args.get("category")
     available = request.args.get("available")
-    
+
     if name is not None:
         app.logger.info("Request to Retrieve all products with name [%s]", name)
         products = Product.find_by_name(name)
         return [product.serialize() for product in products], status.HTTP_200_OK
-    elif category is not None:
+    if category is not None:
         app.logger.info("Request to Retrieve all products with category [%s]", category)
         category_value = getattr(Category, category.upper())
         products = Product.find_by_category(category_value)
         return [product.serialize() for product in products], status.HTTP_200_OK
-    elif available is not None:
+    if available is not None:
         app.logger.info("Request to Retrieve all products with availability [%s]", available)
         b_available = available in ["True", "true", "TRUE", 1]
         products = Product.find_by_availability(b_available)
         return [product.serialize() for product in products], status.HTTP_200_OK
-    else:
-        app.logger.info("Request to Retrieve all products")
-        products = Product.all()
-        return [product.serialize() for product in products], status.HTTP_200_OK
+
+    app.logger.info("Request to Retrieve all products")
+    products = Product.all()
+    return [product.serialize() for product in products], status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<product_id>", methods=["GET"])
 def get_product(product_id):
@@ -150,6 +151,7 @@ def get_product(product_id):
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
+
 
 @app.route("/products/<product_id>", methods=["PUT"])
 def update_product(product_id):
